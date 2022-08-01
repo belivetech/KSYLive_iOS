@@ -700,10 +700,27 @@
  @discussion 参见iOS的 AVCaptureSessionPresetXXX的定义
  */
 - (CGSize) captureDimension {
+    if (_vCapDev == nil) {
+        return CGSizeZero;
+    }
+    NSError *error = nil;
+    if (_vCapDev.inputCamera.videoZoomFactor != 1.0) {
+        if ([_vCapDev.inputCamera lockForConfiguration:&error]) {
+            _vCapDev.inputCamera.videoZoomFactor = 1.0;
+            [_vCapDev.inputCamera unlockForConfiguration];
+        }
+    }
+    if (CGSizeEqualToSize(_streamDimension, _vCapDev.captureDimension)) {
+        return _vCapDev.captureDimension;
+    } else {
+        return _streamDimension;
+    }
+    /*
     if (_vCapDev){
         return _vCapDev.captureDimension;
     }
     return CGSizeZero;
+     */
 }
 
 // 根据朝向, 判断是否需要交换宽和高
